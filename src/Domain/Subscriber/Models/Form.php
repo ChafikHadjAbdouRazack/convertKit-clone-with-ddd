@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Form extends BaseModel
 {
-
     public function subscribers(): HasMany
     {
         return $this->hasMany(Subscriber::class);

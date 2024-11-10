@@ -8,15 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Subscriber extends BaseModel
 {
-
-
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
     }
 
-    public function form(): BelongsTo{
+    public function form(): BelongsTo
+    {
         return $this->belongsTo(Form::class)->withDefault();
     }
-
 }
