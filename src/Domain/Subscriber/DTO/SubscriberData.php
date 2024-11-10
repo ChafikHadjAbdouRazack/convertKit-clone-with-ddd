@@ -6,6 +6,7 @@ use Domain\Subscriber\Models\Form;
 use Domain\Subscriber\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Spatie\LaravelData\Concerns\WithDeprecatedCollectionMethod;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 
@@ -15,6 +16,7 @@ class SubscriberData extends Data
         public readonly string $email,
         public readonly string $first_name,
         public readonly string $last_name,
+        /** @var  DataCollection<TagData> */
         public readonly ?DataCollection $tags,
         public readonly ?FormData $form,
     ) {}
@@ -34,7 +36,7 @@ class SubscriberData extends Data
     {
         return self::from([
             ...$request->all(),
-            'tags' => TagData::collect(Tag::whereIn('id', $request->collect('tag_ids'))->get()),
+            'tags' => TagData::collection(Tag::whereIn('id', $request->collect('tag_ids'))->get()),
             'form' => FormData::from(
                 Form::findOrNew($request->form_id),
             ),
