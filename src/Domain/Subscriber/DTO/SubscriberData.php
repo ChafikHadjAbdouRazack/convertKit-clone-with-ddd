@@ -2,6 +2,9 @@
 
 namespace Domain\Subscriber\DTO;
 
+use Domain\Subscriber\Models\Form;
+use Domain\Subscriber\Models\Tag;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
@@ -16,13 +19,25 @@ class SubscriberData extends Data
         public readonly ?FormData $form,
     ) {}
 
-    public static function rules(): array{
+    public static function rules(): array
+    {
         return [
-            'email' => ['required', 'email',Rule::unique('subscribers','email')->ignore(request('subscriber'))],
+            'email' => ['required', 'email', Rule::unique('subscribers', 'email')->ignore(request('subscriber'))],
             'first_name' => ['required', 'string'],
             'last_name' => ['required', 'string'],
-            'tag_ids' => ['nullable', 'sometimes','array'],
-            'form_id' => ['nullable', 'sometimes','exists:forms,id'],
+            'tag_ids' => ['nullable', 'sometimes', 'array'],
+            'form_id' => ['nullable', 'sometimes', 'exists:forms,id'],
         ];
+    }
+
+    public static function fromRequest(Request $request): self
+    {
+        return self::from([
+            ...$request->all(),
+            'tags' => TagData::collect(Tag::whereIn('id', $request->collect('tag_ids'))->get()),
+            'form' => FormData::from(
+                Form::findOrNew($request->form_id),
+            ),
+        ]);
     }
 }
